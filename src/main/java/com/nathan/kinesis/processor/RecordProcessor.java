@@ -1,4 +1,4 @@
-package com.nathan.processor;
+package com.nathan.kinesis.processor;
 
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.InvalidStateException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ShutdownException;

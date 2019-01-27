@@ -13,7 +13,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorFactory;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.KinesisClientLibConfiguration;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.Worker;
-import com.nathan.processor.RecordProcessorFactory;
+import com.nathan.kinesis.DataStreamConsumer;
+import com.nathan.kinesis.processor.RecordProcessorFactory;
 
 import java.util.UUID;
 
@@ -30,39 +31,10 @@ public class KinesisRecieverApplication implements CommandLineRunner {
     }
 
     public void run(String... args) throws Exception {
-
-        AWSCredentialsProvider credentialsProvider = new AWSCredentialsProvider() {
-            @Override
-            public AWSCredentials getCredentials() {
-                return new BasicAWSCredentials("dummy", "dummy");
-            }
-
-            @Override
-            public void refresh() {
-
-            }
-        };
-
-        String workerId = String.valueOf(UUID.randomUUID());
-        KinesisClientLibConfiguration kclConfig =
-                new KinesisClientLibConfiguration("KinesisRecieverApplication", STREAM_NAME, credentialsProvider, workerId)
-                        .withRegionName("dummy")
-                        .withCommonClientConfig(new ClientConfiguration());
-
-        IRecordProcessorFactory recordProcessorFactory = new RecordProcessorFactory();
-
-        // Create the KCL worker with the processor factory
-        Worker worker = new Worker(recordProcessorFactory, kclConfig);
-
-        int exitCode = 0;
-        try {
-            worker.run();
-        } catch (Throwable t) {
-            logger.error("Caught throwable while processing data.", t);
-            exitCode = 1;
-        }
-        System.exit(exitCode);
-
+        DataStreamConsumer.newBuilder().appName(KinesisRecieverApplication.class.getName()).
+                credentialsProvider("dummt", "dummy").
+                recordProcessorFactory(new RecordProcessorFactory()).streamName(STREAM_NAME).signingRegion("us-east-1")
+                .build().start();
     }
 
 }
